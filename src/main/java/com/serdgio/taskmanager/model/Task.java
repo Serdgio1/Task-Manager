@@ -1,4 +1,26 @@
 package com.serdgio.taskmanager.model;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.UUID;
+
 public class Task {
+    private final UUID id;
+    private String title;
+    private String description;
+    TaskSatus satus;
+    Instant createdAt;
+    LocalDateTime deadline;
+    Priority priority;
+
+    public Task(String title, String description, Instant createdAt, LocalDateTime deadline, Priority priority) {
+        this.id = UUID.randomUUID();
+        this.title = title;
+        this.description = description;
+        this.createdAt = createdAt;
+        this.deadline = deadline;
+        this.priority = priority;
+    }
+
+
 }
