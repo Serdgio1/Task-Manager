@@ -1,28 +1,29 @@
 package com.serdgio.taskmanager.ui;
 
 import com.serdgio.taskmanager.model.Task;
+import com.serdgio.taskmanager.service.TaskService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleUI {
     private final Scanner scanner = new Scanner(System.in);
+    TaskService taskService = new TaskService(scanner);
 
     public void start() {
-        List<Task> tasks = new ArrayList<>();
         System.out.println("Welcome to the TaskManager application!");
         while (true) {
             printMenu();
-            int option = readInt("Enter your option: ");
+            int option = readInt();
 
             switch (option) {
-                case 1 -> System.out.println("Welcome to the TaskManager application!");
+                case 1 -> taskService.addTask();
                 case 2 -> System.out.println("Welcome to the TaskManager application!");
                 case 3 -> System.out.println("Welcome to the TaskManager application!");
-                case 4 -> showTasks(tasks);
+                case 4 -> showTasks(taskService.getTasks());
                 case 5 -> System.out.println("Welcome to the TaskManager application!");
-                case 6 -> {
+                case 6 -> System.out.println("Welcome to the TaskManager application!");
+                case 7 -> {
                     System.out.println("Goodbye");
                     return;
                 }
@@ -39,13 +40,14 @@ public class ConsoleUI {
                 3. Delete Task
                 4. View Tasks
                 5. Save Task
-                6. Exit
+                6. Edit Task
+                7. Exit
                 """);
     }
 
-    private int readInt(String prompt) {
+    private int readInt() {
         while (true) {
-            System.out.print(prompt);
+            System.out.print("Enter your option: ");
             String input = scanner.nextLine().trim();
 
             try {
@@ -62,4 +64,6 @@ public class ConsoleUI {
             System.out.println(task);
         }
     }
+
+
 }
