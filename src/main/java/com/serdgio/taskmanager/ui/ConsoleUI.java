@@ -19,7 +19,7 @@ public class ConsoleUI {
             switch (option) {
                 case 1 -> taskService.addTask();
                 case 2 -> System.out.println("Welcome to the TaskManager application!");
-                case 3 -> System.out.println("Welcome to the TaskManager application!");
+                case 3 -> deleteTaskUI();
                 case 4 -> showTasks(taskService.getTasks());
                 case 5 -> System.out.println("Welcome to the TaskManager application!");
                 case 6 -> System.out.println("Welcome to the TaskManager application!");
