@@ -22,5 +22,18 @@ public class Task {
         this.priority = priority;
     }
 
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        TaskService tS = new TaskService();
+        LocalDateTime now = tS.formatDate(this.createdAt);
+        return this.id + " " + this.title + " " + this.description + " " + now + " " + this.deadline + " " +  this.priority;
+    }
 }
