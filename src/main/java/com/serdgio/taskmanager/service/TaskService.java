@@ -5,6 +5,7 @@ import com.serdgio.taskmanager.model.Task;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -15,6 +16,8 @@ public class TaskService {
     List<Task> tasks = new ArrayList<>();
     Scanner scanner;
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
+    public TaskService() {}
 
     public TaskService(Scanner scanner) {
         this.scanner = scanner;
@@ -75,6 +78,15 @@ public class TaskService {
                 System.out.println("Invalid date. Please try again.");
             }
         }
+    }
+
+    public LocalDateTime formatDate(Instant input) {
+        try {
+            return LocalDateTime.ofInstant(input, ZoneId.systemDefault());
+        } catch (DateTimeParseException e) {
+        System.out.println("Invalid date. Please try again.");
+        }
+        return null;
     }
 
     public void deleteTask(int id) {
