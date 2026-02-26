@@ -65,5 +65,25 @@ public class ConsoleUI {
         }
     }
 
+    private void deleteTaskUI() {
+        while (true) {
+            System.out.println("Please enter the id of the task you would like to delete:");
+            int id = readInt();
+            if (id > taskService.getTasks().size() || id < 1) {
+                System.out.println("Invalid input. Please try again.");
+                continue;
+            }
+            System.out.println("Are you sure you want to delete this task?");
+            String answer = scanner.nextLine().trim();
+            if (answer.equalsIgnoreCase("yes")) {
+                taskService.deleteTask(id);
+                break;
+            } else if (answer.equalsIgnoreCase("no")) {
+                break;
+            } else {
+                System.out.println("Invalid input. Please try again.");
+            }
+        }
+    }
 
 }
