@@ -76,4 +76,17 @@ public class TaskService {
             }
         }
     }
+
+    public void deleteTask(int id) {
+        boolean f = false;
+        for (Task task : tasks) {
+            if (id == task.getId())  {
+                tasks.remove(task);
+                f = true;
+            }
+            if (f) {
+                task.setId(task.getId() - 1);
+            }
+        }
+    }
 }
