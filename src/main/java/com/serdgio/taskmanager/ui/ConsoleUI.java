@@ -41,7 +41,8 @@ public class ConsoleUI {
                 3. Delete Task
                 4. View Tasks
                 5. Save Task
-                6. Exit
+                6. Load Tasks
+                7. Exit
                 """);
     }
 

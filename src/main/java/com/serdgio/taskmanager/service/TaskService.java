@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -58,7 +59,7 @@ public class TaskService {
     private Priority readPriority() {
         while (true) {
             System.out.print("Priority(LOW, MEDIUM, HIGH): ");
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().trim();
 
             try {
                 return Priority.valueOf(input.toUpperCase());
@@ -71,12 +72,12 @@ public class TaskService {
     private LocalDateTime date() {
         while (true) {
             System.out.print("Deadline in format (dd.MM.yyyy) or enter to skip: ");
-            String input = scanner.nextLine();
+            String input = scanner.nextLine().trim();
             if (input.isEmpty()) {
                 return null;
             }
             try {
-                return LocalDateTime.parse(input.trim(), formatter);
+                return LocalDate.parse(input, formatter).atStartOfDay();
             } catch (DateTimeParseException e) {
                 System.out.println("Invalid date. Please try again.");
             }
@@ -130,17 +131,23 @@ public class TaskService {
     }
 
     private String extractTaskData() {
-        String data = "";
+        StringBuilder data = new StringBuilder();
         for (Task task : tasks) {
-            data += task.getId() + ". " + task.getTitle() + " " + task.getDescription() + " " + task.getCreatedAt().toString();
-            if (task.getDeadline() != null) {
-                data += " " + task.getDeadline().format(formatter);
-            } else {
-                data += " ";
+            data.append(task.getId()).append(". ").append(task.getTitle()).append(" ");
+            if (task.getDescription() != null) {
+                data.append(task.getDescription()).append(" ");
             }
-            data += " " + task.getPriority().name() + "\n";
+
+            data.append(task.getCreatedAt().toString()).append(" ");
+
+            if (task.getDeadline() != null) {
+                data.append(" ").append(task.getDeadline().format(formatter));
+            } else {
+                data.append(" ");
+            }
+            data.append(" ").append(task.getPriority().name()).append("\n");
         }
-        return data;
+        return data.toString();
     }
 
     public void saveTasks(Path path) throws IOException {
@@ -151,19 +158,54 @@ public class TaskService {
     public void loadTasks(Path path) throws IOException {
         tasks.clear();
         List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+
         for (String line : lines) {
-            String[] parts = line.split(" ", 5);
-            int id = Integer.parseInt(parts[0].replace(".", ""));
-            String title = parts[1];
-            String description = parts[2].equals("null") ? null : parts[2];
-            Instant createdAt = Instant.parse(parts[3]);
-            LocalDateTime deadline = null;
-            if (!parts[4].isBlank()) {
-                deadline = LocalDateTime.parse(parts[4], formatter);
+            if (line == null || line.isBlank()) {
+                continue;
             }
-            Priority priority = Priority.valueOf(parts[5]);
-            Task task = new Task(title, description, createdAt, deadline, priority);
-            tasks.add(task);
+
+            String[] parts = line.trim().split("\\s+");
+
+            String title;
+            String description;
+            Instant created;
+            LocalDateTime deadline;
+            Priority priority;
+
+            try {
+                if (parts.length == 6) {
+                    title = parts[1];
+                    description = parts[2];
+                    created = Instant.parse(parts[3]);
+                    deadline = LocalDate.parse(parts[4], formatter).atStartOfDay();
+                    priority = Priority.valueOf(parts[5].trim().toUpperCase());
+                } else if (parts.length == 5) {
+                    title = parts[1];
+                    try {
+                        created = Instant.parse(parts[2]);
+                        deadline = LocalDate.parse(parts[3], formatter).atStartOfDay();
+                        priority = Priority.valueOf(parts[4].trim().toUpperCase());
+                        description = null;
+                    } catch (DateTimeParseException e) {
+                        description = parts[2];
+                        created = Instant.parse(parts[3]);
+                        priority = Priority.valueOf(parts[4].trim().toUpperCase());
+                        deadline = null;
+                    }
+                } else if (parts.length == 4) {
+                    title = parts[1];
+                    created = Instant.parse(parts[2]);
+                    priority = Priority.valueOf(parts[3].trim().toUpperCase());
+                    description = null;
+                    deadline = null;
+                } else {
+                    continue;
+                }
+
+                tasks.add(new Task(title, description, created, deadline, priority));
+            } catch (RuntimeException e) {
+                System.out.println("Skipping malformed task line: " + line + " (" + e.getMessage() + ")");
+            }
         }
     }
 }
