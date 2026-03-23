@@ -1,9 +1,11 @@
 package com.serdgio.taskmanager.ui;
 
+import com.serdgio.taskmanager.model.Priority;
 import com.serdgio.taskmanager.model.Task;
 import com.serdgio.taskmanager.service.TaskService;
 
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
@@ -61,7 +63,13 @@ public class ConsoleUI {
 
     private void addTaskUI() {
         System.out.println("\n=== Add New Task ===");
-        taskService.addTask();
+        String name = ConsoleInputHelper.readNonBlank("Name: ", scanner);
+        System.out.print("Description(enter for null): ");
+        String description = scanner.nextLine();
+        Priority priority = ConsoleInputHelper.readPriority(scanner);
+        LocalDateTime deadline = ConsoleInputHelper.readDeadline(scanner);
+
+        taskService.addTask(name, description, priority, deadline);
         System.out.println("Task created successfully!\n");
     }
 
