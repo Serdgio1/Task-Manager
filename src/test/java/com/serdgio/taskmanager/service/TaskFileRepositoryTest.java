@@ -38,7 +38,7 @@ class TaskFileRepositoryTest {
 
         assertEquals(2, result.tasks().size());
         assertTrue(result.warnings().isEmpty());
-        assertEquals(1, result.tasks().get(0).getId());
+        assertEquals(1, result.tasks().getFirst().getId());
         assertEquals("task one", result.tasks().get(0).getTitle());
         assertEquals("desc with spaces", result.tasks().get(0).getDescription());
         assertEquals(2, result.tasks().get(1).getId());

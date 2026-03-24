@@ -55,9 +55,9 @@ class TaskServiceTest {
         List<Task> tasks = taskService.getTasks();
         assertFalse(updated);
         assertEquals(2, tasks.size());
-        assertEquals(1, tasks.get(0).getId());
-        assertEquals("t1", tasks.get(0).getTitle());
-        assertEquals("d1", tasks.get(0).getDescription());
+        assertEquals(1, tasks.getFirst().getId());
+        assertEquals("t1", tasks.getFirst().getTitle());
+        assertEquals("d1", tasks.getFirst().getDescription());
 
     }
 
@@ -80,10 +80,10 @@ class TaskServiceTest {
         taskService.updateTask(1, "new", "test", Priority.LOW, LocalDate.of(2026, 3, 5).atStartOfDay());
         List<Task> tasks = taskService.getTasks();
         assertEquals(1, tasks.size());
-        assertEquals("new", tasks.get(0).getTitle());
-        assertEquals("test", tasks.get(0).getDescription());
-        assertEquals(Priority.LOW, tasks.get(0).getPriority());
-        assertEquals(LocalDate.of(2026, 3, 5), tasks.get(0).getDeadline().toLocalDate());
+        assertEquals("new", tasks.getFirst().getTitle());
+        assertEquals("test", tasks.getFirst().getDescription());
+        assertEquals(Priority.LOW, tasks.getFirst().getPriority());
+        assertEquals(LocalDate.of(2026, 3, 5), tasks.getFirst().getDeadline().toLocalDate());
     }
 
     @Test
