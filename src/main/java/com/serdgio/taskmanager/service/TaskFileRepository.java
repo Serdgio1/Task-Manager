@@ -10,13 +10,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * File-based implementation of {@link TaskRepository}.
+ * Uses {@link TaskSerializer} to convert tasks to/from text lines.
+ */
 public class TaskFileRepository implements TaskRepository {
     private final TaskSerializer serializer;
 
+    /**
+     * @param serializer serializer used for task line parsing/formatting
+     */
     public TaskFileRepository(TaskSerializer serializer) {
         this.serializer = serializer;
     }
 
+    /**
+     * Writes tasks as UTF-8 text file, one line per task.
+     */
     @Override
     public void save(Path path, List<Task> tasks) throws IOException {
         StringBuilder data = new StringBuilder();
@@ -26,6 +36,10 @@ public class TaskFileRepository implements TaskRepository {
         Files.writeString(path, data.toString(), StandardCharsets.UTF_8);
     }
 
+    /**
+     * Reads tasks from UTF-8 text file and returns parsed tasks plus warnings.
+     * Invalid lines are skipped and represented as {@link LoadWarning}.
+     */
     @Override
     public LoadResult load(Path path) throws IOException {
         List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
