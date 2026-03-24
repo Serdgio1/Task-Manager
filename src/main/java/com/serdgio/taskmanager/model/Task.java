@@ -6,10 +6,10 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class Task {
-    private int id;
+    private final int id;
     private String title;
     private String description;
-    private Instant createdAt;
+    private final Instant createdAt;
     private LocalDateTime deadline;
     private Priority priority;
 
@@ -22,10 +22,6 @@ public class Task {
         this.createdAt = createdAt;
         this.deadline = deadline;
         this.priority = priority;
-    }
-
-    public Task(String title, String description, Instant createdAt, LocalDateTime deadline, Priority priority) {
-        this(0, title, description, createdAt, deadline, priority);
     }
 
     public int getId() {
