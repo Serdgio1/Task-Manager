@@ -9,7 +9,6 @@ public class Task {
     private int id;
     private String title;
     private String description;
-    private TaskStatus status;
     private Instant createdAt;
     private LocalDateTime deadline;
     private Priority priority;
