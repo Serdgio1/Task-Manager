@@ -13,16 +13,29 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Core business service for in-memory task management.
+ * Handles validation, ID assignment, updates, and replacement after load.
+ */
 public class TaskService {
     private final List<Task> tasks = new ArrayList<>();
     private int nextId = 1;
 
     public TaskService() {}
 
+    /**
+     * @return immutable view of current tasks
+     */
     public List<Task> getTasks() {
         return Collections.unmodifiableList(tasks);
     }
 
+    /**
+     * Finds a task by id.
+     *
+     * @param id task id
+     * @return task wrapped in optional when found
+     */
     public Optional<Task> findById(int id) {
         for (Task task : tasks) {
             if (task.getId() == id) {
@@ -32,6 +45,14 @@ public class TaskService {
         return Optional.empty();
     }
 
+    /**
+     * Creates a new task.
+     *
+     * @param name title, must be non-blank
+     * @param description optional description, blank becomes null
+     * @param priority optional priority, defaults to MEDIUM
+     * @param deadline optional deadline
+     */
     public void addTask(String name, String description, Priority priority, LocalDateTime deadline) {
         String normalizedName = normalizeName(name);
         String normalizedDescription = normalizeDescription(description);
@@ -40,6 +61,12 @@ public class TaskService {
         tasks.add(new Task(nextId++, normalizedName, normalizedDescription, created, deadline, normalizedPriority));
     }
 
+    /**
+     * Deletes task by id.
+     *
+     * @param id task id
+     * @return true when task was removed
+     */
     public boolean deleteTask(int id) {
         for (int i = 0; i < tasks.size(); i++) {
             if (tasks.get(i).getId() == id) {
@@ -50,6 +77,11 @@ public class TaskService {
         return false;
     }
 
+    /**
+     * Updates existing task by id.
+     *
+     * @return true when task with id exists and was updated
+     */
     public boolean updateTask(int id,  String name, String description, Priority priority, LocalDateTime deadline) {
         String normalizedName = normalizeName(name);
         String normalizedDescription = normalizeDescription(description);
@@ -82,6 +114,12 @@ public class TaskService {
         return priority == null ? Priority.MEDIUM : priority;
     }
 
+    /**
+     * Replaces all in-memory tasks with loaded tasks.
+     * Also validates incoming collection and recalculates next ID.
+     *
+     * @param loadedTasks loaded tasks to apply
+     */
     public void replaceAllTasks(List<Task> loadedTasks) {
         if (loadedTasks == null) {
             throw new IllegalArgumentException("Loaded tasks cannot be null");
