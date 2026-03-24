@@ -19,8 +19,8 @@ class TaskServiceTest {
 
     @Test
     void deleteTask_WhenIdDoesNotExist_doesNotChangeList() {
-        taskService.addTask("t1", "d1", LocalDate.of(2026, 3, 5));
-        taskService.addTask("t2", "d2", LocalDate.of(2026,3,6));
+        taskService.addTask("t1", "d1", Priority.MEDIUM, LocalDate.of(2026, 3, 5).atStartOfDay());
+        taskService.addTask("t2", "d2", Priority.MEDIUM, LocalDate.of(2026,3,6).atStartOfDay());
 
         int before = taskService.getTasks().size();
         boolean deleted = taskService.deleteTask(999);
@@ -32,9 +32,9 @@ class TaskServiceTest {
 
     @Test
     void deleteTask_WhenRemoved_keepsRemainingIdsStable() {
-        taskService.addTask("t1", "d1", LocalDate.of(2026, 3, 5));
-        taskService.addTask("t2", "d2", LocalDate.of(2026,3,6));
-        taskService.addTask("t3", "d3", LocalDate.of(2026,3,7));
+        taskService.addTask("t1", "d1", Priority.MEDIUM, LocalDate.of(2026, 3, 5).atStartOfDay());
+        taskService.addTask("t2", "d2", Priority.MEDIUM, LocalDate.of(2026,3,6).atStartOfDay());
+        taskService.addTask("t3", "d3", Priority.MEDIUM, LocalDate.of(2026,3,7).atStartOfDay());
 
         boolean deleted = taskService.deleteTask(2);
 
@@ -47,10 +47,10 @@ class TaskServiceTest {
 
     @Test
     void updateTask_WhenIdDoesNotExist_doesNotChangeList() {
-        taskService.addTask("t1", "d1", LocalDate.of(2026, 3, 5));
-        taskService.addTask("t2", "d2", LocalDate.of(2026,3,6));
+        taskService.addTask("t1", "d1", Priority.MEDIUM, LocalDate.of(2026, 3, 5).atStartOfDay());
+        taskService.addTask("t2", "d2", Priority.MEDIUM, LocalDate.of(2026,3,6).atStartOfDay());
 
-        boolean updated = taskService.updateTask(999, "new", "test", Priority.LOW, LocalDate.of(2026, 3, 5));
+        boolean updated = taskService.updateTask(999, "new", "test", Priority.LOW, LocalDate.of(2026, 3, 5).atStartOfDay());
 
         List<Task> tasks = taskService.getTasks();
         assertFalse(updated);
@@ -63,19 +63,21 @@ class TaskServiceTest {
 
     @Test
     void addTask_WhenNameIsBlank_throwsIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> taskService.addTask("", "d1", LocalDate.of(2026, 3, 5)));
+        assertThrows(IllegalArgumentException.class,
+                () -> taskService.addTask("", "d1", Priority.MEDIUM, LocalDate.of(2026, 3, 5).atStartOfDay()));
     }
 
     @Test
     void updateTask_WhenNameIsBlank_throwsIllegalArgumentException() {
-        taskService.addTask("t1", "d1", LocalDate.of(2026, 3, 5));
-        assertThrows(IllegalArgumentException.class, () -> taskService.updateTask(1, "", "d2", Priority.LOW, LocalDate.of(2026, 3, 5)));
+        taskService.addTask("t1", "d1", Priority.MEDIUM, LocalDate.of(2026, 3, 5).atStartOfDay());
+        assertThrows(IllegalArgumentException.class,
+                () -> taskService.updateTask(1, "", "d2", Priority.LOW, LocalDate.of(2026, 3, 5).atStartOfDay()));
     }
 
     @Test
     void updateTask_WhenIdExists_UpdatesNormalizedFields() {
-        taskService.addTask("t1", "d1", LocalDate.of(2026, 3, 5));
-        taskService.updateTask(1, "new", "test", Priority.LOW, LocalDate.of(2026, 3, 5));
+        taskService.addTask("t1", "d1", Priority.MEDIUM, LocalDate.of(2026, 3, 5).atStartOfDay());
+        taskService.updateTask(1, "new", "test", Priority.LOW, LocalDate.of(2026, 3, 5).atStartOfDay());
         List<Task> tasks = taskService.getTasks();
         assertEquals(1, tasks.size());
         assertEquals("new", tasks.get(0).getTitle());
@@ -86,8 +88,8 @@ class TaskServiceTest {
 
     @Test
     void findById_WhenIdExists_ReturnsTask() {
-        taskService.addTask("t1", "d1", LocalDate.of(2026, 3, 5));
-        taskService.addTask("t2", "d2", LocalDate.of(2026, 3, 6));
+        taskService.addTask("t1", "d1", Priority.MEDIUM, LocalDate.of(2026, 3, 5).atStartOfDay());
+        taskService.addTask("t2", "d2", Priority.MEDIUM, LocalDate.of(2026, 3, 6).atStartOfDay());
 
         assertTrue(taskService.findById(2).isPresent());
         assertEquals("t2", taskService.findById(2).orElseThrow().getTitle());
@@ -95,7 +97,7 @@ class TaskServiceTest {
 
     @Test
     void getTasks_WhenAttemptToModify_ThrowsUnsupportedOperationException() {
-        taskService.addTask("t1", "d1", LocalDate.of(2026, 3, 5));
+        taskService.addTask("t1", "d1", Priority.MEDIUM, LocalDate.of(2026, 3, 5).atStartOfDay());
 
         List<Task> tasks = taskService.getTasks();
         assertThrows(UnsupportedOperationException.class, tasks::clear);
@@ -109,7 +111,7 @@ class TaskServiceTest {
                 null, Priority.LOW);
 
         taskService.replaceAllTasks(List.of(t1, t2));
-        taskService.addTask("after load", "new", LocalDate.of(2026, 3, 20));
+        taskService.addTask("after load", "new", Priority.MEDIUM, LocalDate.of(2026, 3, 20).atStartOfDay());
 
         List<Task> tasks = taskService.getTasks();
         assertEquals(3, tasks.size());
