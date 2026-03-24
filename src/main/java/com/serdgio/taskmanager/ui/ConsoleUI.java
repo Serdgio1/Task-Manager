@@ -2,7 +2,12 @@ package com.serdgio.taskmanager.ui;
 
 import com.serdgio.taskmanager.model.Priority;
 import com.serdgio.taskmanager.model.Task;
+import com.serdgio.taskmanager.service.LoadResult;
+import com.serdgio.taskmanager.service.LoadWarning;
+import com.serdgio.taskmanager.service.TaskFileRepository;
+import com.serdgio.taskmanager.service.TaskRepository;
 import com.serdgio.taskmanager.service.TaskService;
+import com.serdgio.taskmanager.service.TaskSerializer;
 
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -11,7 +16,8 @@ import java.util.Scanner;
 
 public class ConsoleUI {
     private final Scanner scanner = new Scanner(System.in);
-    TaskService taskService = new TaskService(scanner);
+    private final TaskService taskService = new TaskService();
+    private final TaskRepository taskRepository = new TaskFileRepository(new TaskSerializer());
 
     public void start() {
         System.out.println("Welcome to the TaskManager application!");
@@ -88,7 +94,7 @@ public class ConsoleUI {
                 break;
             }
 
-            if (id > taskService.getTasks().size() || id < 1) {
+            if (id < 1) {
                 System.out.println("Invalid input. Please try again.");
                 continue;
             }
@@ -97,8 +103,12 @@ public class ConsoleUI {
             String answer = scanner.nextLine().trim();
 
             if (answer.equalsIgnoreCase("yes")) {
-                taskService.deleteTask(id);
-                System.out.println("Task deleted successfully!\n");
+                boolean deleted = taskService.deleteTask(id);
+                if (deleted) {
+                    System.out.println("Task deleted successfully!\n");
+                } else {
+                    System.out.println("Task with this id does not exist.\n");
+                }
                 break;
             } else if (answer.equalsIgnoreCase("no")) {
                 System.out.println("Deletion cancelled.\n");
@@ -117,7 +127,7 @@ public class ConsoleUI {
                     break;
             }
 
-            if (id > taskService.getTasks().size() || id < 1) {
+            if (id < 1) {
                 System.out.println("Invalid input. Please try again.");
                 continue;
             }
@@ -127,8 +137,19 @@ public class ConsoleUI {
             if (answer.equalsIgnoreCase("no")) {
                 break;
             } else if (answer.equalsIgnoreCase("yes")) {
-                taskService.updateTask(id);
-                System.out.println("Task updated successfully!\n");
+                System.out.println("Update Task");
+                String name = ConsoleInputHelper.readNonBlank("Name: ", scanner);
+                System.out.print("Description(enter for null): ");
+                String description = scanner.nextLine();
+                description = description.isBlank() ? null : description;
+                Priority priority = ConsoleInputHelper.readPriority(scanner);
+                LocalDateTime deadline = ConsoleInputHelper.readDeadline(scanner);
+                boolean updated = taskService.updateTask(id, name, description, priority, deadline);
+                if (updated) {
+                    System.out.println("Task updated successfully!\n");
+                } else {
+                    System.out.println("Task with this id does not exist.\n");
+                }
                 break;
             }
         }
@@ -146,7 +167,7 @@ public class ConsoleUI {
         if (result == javax.swing.JFileChooser.APPROVE_OPTION) {
             Path path = fileChooser.getSelectedFile().toPath().toAbsolutePath();
             try {
-                taskService.saveTasks(path);
+                taskRepository.save(path, taskService.getTasks());
                 System.out.println("Tasks saved successfully!\n");
             } catch (Exception e) {
                 System.out.println("Error saving tasks: " + e.getMessage() + "\n");
@@ -166,7 +187,12 @@ public class ConsoleUI {
         if (result == javax.swing.JFileChooser.APPROVE_OPTION) {
             Path path = fileChooser.getSelectedFile().toPath().toAbsolutePath();
             try {
-                taskService.loadTasks(path);
+                LoadResult loadResult = taskRepository.load(path);
+                taskService.replaceAllTasks(loadResult.tasks());
+                for (LoadWarning warning : loadResult.warnings()) {
+                    System.out.println("Warning [" + warning.code() + "]: " + warning.message()
+                            + " Line: " + warning.sourceLine());
+                }
                 System.out.println("Tasks loaded successfully!\n");
             } catch (Exception e) {
                 System.out.println("Error loading tasks: " + e.getMessage() + "\n");
