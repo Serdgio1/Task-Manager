@@ -5,11 +5,6 @@ build/
 !**/src/test/**/build/
 .kotlin
 .idea/
-build.gradle
-gradle/
-gradlew
-gradlew.bat
-settings.gradle
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
