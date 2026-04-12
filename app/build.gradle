@@ -1,0 +1,15 @@
+plugins {
+    id 'application'
+}
+
+dependencies {
+    implementation project(':ui')
+}
+
+application {
+    mainClass = 'com.serdgio.taskmanager.Main'
+}
+
+tasks.named('run') {
+    standardInput = System.in
+}

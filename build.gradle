@@ -1,35 +1,30 @@
 plugins {
     id 'java'
-    id 'application'
 }
 
-group = 'com.labwork1'
-version = '1.0-SNAPSHOT'
+subprojects {
+    apply plugin: 'java'
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+    group = 'com.serdgio'
+    version = '1.0-SNAPSHOT'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(25)
+        }
     }
-}
 
-application {
-    mainClass = 'com.serdgio.taskmanager.Main'
-}
+    repositories {
+        mavenCentral()
+    }
 
-tasks.named('run') {
-    standardInput = System.in
-}
+    dependencies {
+        testImplementation platform('org.junit:junit-bom:5.10.0')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
 
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-}
-
-test {
-    useJUnitPlatform()
+    test {
+        useJUnitPlatform()
+    }
 }

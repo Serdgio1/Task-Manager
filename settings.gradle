@@ -1,1 +1,6 @@
 rootProject.name = 'Task_Manager'
+
+include(':core')
+include(':persistence')
+include(':ui')
+include(':app')
