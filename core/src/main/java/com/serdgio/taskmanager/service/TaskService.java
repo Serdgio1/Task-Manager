@@ -37,12 +37,9 @@ public class TaskService {
      * @return task wrapped in optional when found
      */
     public Optional<Task> findById(int id) {
-        for (Task task : tasks) {
-            if (task.getId() == id) {
-                return Optional.of(task);
-            }
-        }
-        return Optional.empty();
+        return tasks.stream()
+                .filter(task -> task.getId() == id)
+                .findFirst();
     }
 
     /**
@@ -68,13 +65,7 @@ public class TaskService {
      * @return true when task was removed
      */
     public boolean deleteTask(int id) {
-        for (int i = 0; i < tasks.size(); i++) {
-            if (tasks.get(i).getId() == id) {
-                tasks.remove(i);
-                return true;
-            }
-        }
-        return false;
+        return tasks.removeIf(task -> task.getId() == id);
     }
 
     /**
